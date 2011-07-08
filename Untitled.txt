@@ -1,5 +1,5 @@
-SELECT     fk_proizvod, akvizicija, SUM([11.6.2011]) AS [11.6.2011]FROM         (SELECT     TOP (100) PERCENT dbo.x_narudzba.fk_proizvod, dbo.x_narudzba.akvizicija,                                               (CASE x_narudzba.datum_od WHEN '2011.06.11' THEN COUNT(x_narudzba.id) ELSE 0 END) AS [11.6.2011]                       FROM          dbo.x_narudzba INNER JOIN                                              dbo.x_povijest ON dbo.x_narudzba.id = dbo.x_povijest.fk_narudzba                       WHERE      (dbo.x_povijest.status = N'narudžbe_eksport') AND (dbo.x_povijest.odradeno <> CONVERT(DATETIME, '1900-01-01 00:00:00', 102))                       GROUP BY dbo.x_narudzba.datum_od, dbo.x_narudzba.fk_proizvod, dbo.x_narudzba.akvizicija                       HAVING      (dbo.x_narudzba.fk_proizvod = N'24') AND (dbo.x_narudzba.akvizicija = N'M+')                       ORDER BY dbo.x_narudzba.fk_proizvod, dbo.x_narudzba.akvizicija) AS tablica1GROUP BY fk_proizvod, akvizicija
-***********************************************************************
+http://www.herongyang.com/Swing/jtext.html
+http://java-sl.com/envelope.html
 
 
 http://howmanyleft.co.uk/
