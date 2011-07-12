@@ -9,6 +9,9 @@ http://www.eclipse.org/downloads/download.php?file=/eclipse/downloads/drops/R-3.
 
 http://www.eclipse.org/downloads/packages/eclipse-classic-37/indigor
 
+časopisi:
+Newscientist
+
 slike:
 http://penelopepopsicle.com/
 http://pinterest.com/
