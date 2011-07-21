@@ -1,3 +1,9 @@
+Periodične narudžbe (svaka 2 tjedna ili više)
+
+
+Info telefon:
+novi ciklus
+
 http://www.herongyang.com/Swing/jtext.html
 http://java-sl.com/envelope.html
 
@@ -9,7 +15,7 @@ http://www.eclipse.org/downloads/download.php?file=/eclipse/downloads/drops/R-3.
 
 http://www.eclipse.org/downloads/packages/eclipse-classic-37/indigor
 
-časopisi:
+ƒçasopisi:
 Newscientist
 
 slike:
@@ -17,7 +23,7 @@ http://penelopepopsicle.com/
 http://pinterest.com/
 
 mactube
-filter za pretražiivanje
+filter za pretra≈æiivanje
 ***nova univers
 digitaldave1982
 thesciencefoundation
