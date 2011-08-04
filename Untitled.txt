@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 http://help.sap.com/saphelp_crmscen70/helpdata/en/4a/9eb12521864ff0a82cdc2a373d5d89/frameset.htm
 
 http://help.sap.com/crm/
@@ -5,6 +6,11 @@ http://help.sap.com/crm/
 http://www.sap.com/solutions/business-suite/crm/featuresfunctions/webchannel/index.epx
 
 --------------------------------------------------------------------------
+=======
+pitanja za crm
+.2 ista prospecta od dva različita akvizitera - kako raditi importirati i označiti kao postojeći ?
+.da li info raditi do prvog dana narudžbe ili dan ranije (zbog "prvi dan dostave"
+>>>>>>> imac2
 
 Periodične narudžbe (svaka 2 tjedna ili više)
 
