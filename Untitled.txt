@@ -1,4 +1,17 @@
+<<<<<<< HEAD
 freeride-gangsta
+=======
+klaspoziv1
+----------
+id	int	Uncheckedorg	nvarchar(50)	Checkedorg_jed	nvarchar(50)	Checkedproizvod	nvarchar(50)	Checkedrbr1	int	Checkedrbr2	int	Checkedopis	nvarchar(50)	Checked
+
+É
+13	VLPO	NULL	24	9	0	moj24
+
+x_klasifikacija_stavka
+----------------------
+id	int	Uncheckedfk_kla	int	Checkedrazlog	nvarchar(50)	Checkedjed	uniqueidentifier	Checkedkategorija	nvarchar(50)	Checkeddatum_rje	datetime	Checkedrjeseno	int	Checkedproizvod	nvarchar(50)	Checked
+>>>>>>> mac
 
 test2
 
