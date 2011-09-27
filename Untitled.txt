@@ -1,5 +1,4 @@
-games
-mac Touchgrind
+http://www.automatedworkflows.com/2011/06/07/gui-automation-tools-for-mac-os-x/
 
 space:
 bravemannewworld2
