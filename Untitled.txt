@@ -1,3 +1,6 @@
+tablica
+http://www.zdnet.com/blog/virtualization/another-windows-version-another-hardware-upgrade/3849
+
 http://www.automatedworkflows.com/2011/06/07/gui-automation-tools-for-mac-os-x/
 
 space:
