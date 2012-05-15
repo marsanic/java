@@ -1,0 +1,1266 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.TextField;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyVetoException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
+import javax.swing.Spring;
+import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+
+//import org.omg.CORBA.portable.ValueOutputStream;
+
+import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+
+public class x_PretplatnikUpis1 {
+    
+     //Potrebne zamjene
+     //x_StrankaUpis1 = ovo je puni nazi ove klase
+     //z_Prozor2 = ovo je puni nazi klase poslje
+     //z_Prozor2_pocetna = ovo je naziv ove klase -> definirano u klasi "Pocetna"
+     //z_Prozor1_pocetna = ovo je naziv klase prije -> definirano u klasi "Pocetna"
+     //z_Prozor_intfrm =ovo naziv prozor kroz koji sve prolazi -> definirano u klasi "Pocetna"
+    
+     private  Statement stmt = null;
+     private  ResultSet rs = null;
+    
+         
+     Stranka stranka =new Stranka();
+     Narudzba narudzba=new Narudzba();
+     public Component sadržajprozor () {
+          //to je plavi prozor
+          Pocetna.z_Prozor_intfrm.setTitle(null);
+         
+          int desno=10;
+          int dolje=10;
+          int široko=120;
+          int široko2=280;
+          int visoko=18;
+         
+          JPanel jp = new JPanel(new SpringLayout());
+         
+          jp.add(Naslov(),new SpringLayout.Constraints(
+                    Spring.constant(desno),//desno
+                    Spring.constant(dolje),//dolje
+                    Spring.constant(Pocetna.desktop.getSize().width-75),//široko
+                    Spring.constant(20)));//visoko
+          dolje=dolje+25;    
+          jp.add(PodNaslov(),new SpringLayout.Constraints(
+                    Spring.constant(desno),//desno
+                    Spring.constant(dolje),//dolje
+                    Spring.constant(Pocetna.desktop.getSize().width-75),//široko
+                    Spring.constant(30)));//visoko
+         
+          dolje=dolje+35;
+         
+          jp.add(stranka.OsobniPodaci(),new SpringLayout.Constraints(
+                    Spring.constant(desno),
+                    Spring.constant(dolje),
+                    Spring.constant(500),//široko
+                    Spring.constant(240)));
+         
+          jp.add(narudzba.Narudzba(),new SpringLayout.Constraints(
+                    Spring.constant(520),
+                    Spring.constant(dolje),
+                    Spring.constant(Pocetna.desktop.getSize().width-75-510),//široko
+                    Spring.constant(240)));
+         
+          dolje=dolje+250;
+         
+          jp.add(stranka.AdresniPodaci(),new SpringLayout.Constraints(
+                    Spring.constant(desno),
+                    Spring.constant(dolje),
+                    Spring.constant(500),//Pocetna.desktop.getSize().width-75
+                    Spring.constant(250)));
+         
+          jp.add(stranka.PopisUlica(),new SpringLayout.Constraints(
+                    Spring.constant(520),//desno
+                    Spring.constant(dolje),//dolje
+                    Spring.constant(Pocetna.desktop.getSize().width-75-510),//široko
+                    Spring.constant(250)));//visoko
+         
+          dolje=dolje+260;
+         
+          jp.add(narudzba.Relacije(),new SpringLayout.Constraints(
+                    Spring.constant(desno),//desno
+                    Spring.constant(dolje),//dolje
+                    Spring.constant(Pocetna.desktop.getSize().width-75),//široko
+                    Spring.constant(100)));//visoko
+          narudzba.guieleTablicaRelacije.m_table.registerKeyboardAction(new TablicaAkcijaRelacija(), KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0), 0);
+         
+          dolje=dolje+110;
+         
+          jp.add(narudzba.PregledNarudzba(),new SpringLayout.Constraints(
+                    Spring.constant(desno),//desno
+                    Spring.constant(dolje),//dolje
+                    Spring.constant(Pocetna.desktop.getSize().width-75),//široko
+                    Spring.constant(100)));//visoko
+          narudzba.guieleTablicaPregledNarudzba.m_table.registerKeyboardAction(new TablicaAkcijaNarudzba(), KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0), 0);
+         
+          dolje=dolje+110;
+         
+         
+          jp.add(stranka.PregledUpisa(),new SpringLayout.Constraints(
+                    Spring.constant(desno),//desno
+                    Spring.constant(dolje),//dolje
+                    Spring.constant(Pocetna.desktop.getSize().width-75),//široko
+                    Spring.constant(150)));//visoko
+          stranka.guieleTablicaPregledUpisa.m_table.registerKeyboardAction(new TablicaAkcijaStranka(), KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0), 0);
+         
+          dolje=dolje+160;
+         
+          jp.setPreferredSize(new Dimension(Pocetna.desktop.getSize().width-70,dolje));//(Pocetna.desktop.getSize().width-70, Pocetna.desktop.getSize().height-90));
+          return jp;
+     }
+    
+     class TablicaAkcijaStranka implements ActionListener {
+          public void actionPerformed(ActionEvent e) {
+         
+               //System.out.println("enter");
+              
+               SwingUtilities.invokeLater( new Runnable()
+              {
+                        public void run()
+                        {
+                             int viewRow=stranka.guieleTablicaPregledUpisa.m_table.getSelectedRow();
+                              System.out.println(stranka.guieleTablicaPregledUpisa.m_table.getValueAt(viewRow, 0).toString());
+                             
+                              String id=stranka.guieleTablicaPregledUpisa.m_table.getValueAt(viewRow, 0).toString();
+                              NapuniStranka(Integer.parseInt(id));
+                             
+                              narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeAllElements();
+                              PocistiNarudzba();
+                             int id_nar=NapuniTablicaNarudzba2(Integer.parseInt(id));
+                             NapuniNarudzba(id_nar);
+                             narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.addElement(new StockData("0","","", "","","", "","","","", "", "","", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));                   
+                             
+                            
+                             narudzba.guieleTablicaRelacije.m_data.m_vector.removeAllElements();
+                             DodajTablicaRelacija(id_nar);
+                             
+                        }
+                       
+               });
+               //Pocetna.Popis.dispose();
+               //Pocetna.Izbornik.moveToBack();
+              
+    
+          }
+     }
+    
+     class TablicaAkcijaNarudzba implements ActionListener {
+          public void actionPerformed(ActionEvent e) {
+         
+               //System.out.println("enter");
+              
+               SwingUtilities.invokeLater( new Runnable()
+              {
+                        public void run()
+                        {
+                             int viewRow=narudzba.guieleTablicaPregledNarudzba.m_table.getSelectedRow();
+                              System.out.println(narudzba.guieleTablicaPregledNarudzba.m_table.getValueAt(viewRow, 0).toString());
+                             
+                              String id_nar=narudzba.guieleTablicaPregledNarudzba.m_table.getValueAt(viewRow, 0).toString();
+                              int id=NapuniNarudzba(Integer.parseInt(id_nar));
+                              if (Integer.parseInt(id_nar)==0) PocistiNarudzba();
+                              NapuniStranka(id);
+                             
+                              narudzba.guieleTablicaRelacije.m_data.m_vector.removeAllElements();
+                              DodajTablicaRelacija(Integer.parseInt(id_nar));
+                        }
+                       
+               });
+               //Pocetna.Popis.dispose();
+               //Pocetna.Izbornik.moveToBack();
+              
+    
+          }
+     }
+    
+     class TablicaAkcijaRelacija implements ActionListener {
+          public void actionPerformed(ActionEvent e) {
+         
+               //System.out.println("enter");
+              
+               SwingUtilities.invokeLater( new Runnable()
+              {
+                        public void run()
+                        {
+                             int viewRow=narudzba.guieleTablicaRelacije.m_table.getSelectedRow();
+                              System.out.println(narudzba.guieleTablicaRelacije.m_table.getValueAt(viewRow, 2).toString());
+                             
+                              String id=narudzba.guieleTablicaRelacije.m_table.getValueAt(viewRow, 2).toString();
+                              NapuniStranka(Integer.parseInt(id));
+                             
+                              String id_nar=narudzba.guieleTablicaRelacije.m_table.getValueAt(viewRow, 0).toString();
+                              narudzba.id.setText(id_nar);
+                             
+                              //nađi platitelja i primatelja
+                              try {
+                                        sqlqupit.con = Pocetna.ds.getConnection();
+                                       
+                                        //Narudžba
+                                        String [] args2={"x_narudzba "
+                                                  , " id, fk_placa,fk_prima"};
+                                        String where2=" WHERE id='"+id_nar+"'  ";
+                                       
+                                        rs=sqlqupit.SqlSelect(args2,where2);
+                                       
+                                       
+                                        String datum_od;
+                                        String datum_do;
+                                        while (rs.next()) {
+                                             narudzba.id_pl.setText(rs.getString("fk_placa"));
+                                             narudzba.id_pr.setText(rs.getString("fk_prima"));
+                                        }
+                                       
+                                        sqlqupit.con.close();
+                                   } catch (SQLException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                   }
+                                  
+                              //obriši jednu vrijednost za snimanje promjene
+                              String relacija=narudzba.guieleTablicaRelacije.m_table.getValueAt(viewRow, 1).toString();
+                              if (relacija.equals("PR")) {
+                                   narudzba.id_pr.setText("");
+                                   stranka.id.setText("");
+                              }
+                              if (relacija.equals("PL")){
+                                   narudzba.id_pl.setText("");
+                                   stranka.id.setText("");
+                              }
+                                       
+                                       
+                                       
+                         }
+               });
+               //Pocetna.Popis.dispose();
+               //Pocetna.Izbornik.moveToBack();
+              
+    
+          }
+     }
+
+    
+    
+public void NapuniIzvana(int id, int id_nar){
+         
+    
+          ocisti.setVisible(false);
+          SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+         
+          stranka.guieleTablicaPregledUpisa.m_data.m_vector.removeAllElements();
+          narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeAllElements();
+          narudzba.guieleTablicaRelacije.m_data.m_vector.removeAllElements();
+    
+          PocistiStranka();
+          PocistiNarudzba();
+         
+          try {
+               sqlqupit.con = Pocetna.ds.getConnection();
+              
+               //Stranka    
+               String [] args1={"x_klijent "
+                         , "id" +
+                         ",RTRIM(ime + N' ' + prezime + N' ' + firma) AS stranka " +
+                         ",RTRIM(telefon + N' ' + mobitel) AS telefon"+
+                         ",RTRIM(ulica + N' ' + kbr + N' ' + kbrtxt) AS ulica, RTRIM(pbr + N' ' + mjesto+N' '+ naselje) AS mjesto"
+                         };
+               String where1=" WHERE id='"+id+"'  ";
+               /*String [] args1={" x_klijent INNER JOIN "+
+                     " x_narudzba ON x_klijent.id = x_narudzba.fk_placa"
+                        
+                         , "x_klijent.id, RTRIM(x_klijent.ime + N' ' + x_klijent.prezime + N' ' + x_klijent.firma) AS stranka, "+
+                     " RTRIM(x_klijent.telefon + N' ' + x_klijent.mobitel) AS telefon, RTRIM(x_klijent.ulica + N' ' + x_klijent.kbr + N' ' + x_klijent.kbrtxt) "+
+                     " AS ulica, RTRIM(x_klijent.pbr + N' ' + x_klijent.mjesto + N' ' + x_klijent.naselje) AS mjesto"
+                         };
+               String where1=" WHERE   x_narudzba.id ='"+id_nar+"'  ";   ";*/
+         
+              
+               rs=sqlqupit.SqlSelect(args1,where1);
+              
+                 
+               while (rs.next()) {
+                    stranka.guieleTablicaPregledUpisa.m_data.m_vector.addElement(new StockData(rs.getString("id"),rs.getString("stranka"), rs.getString("ulica"), rs.getString("mjesto"), rs.getString("telefon"), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));
+                   
+               }
+               TableRowSorter<StockTableDataTest> sorter2= new TableRowSorter<StockTableDataTest>(stranka.guieleTablicaPregledUpisa.m_data);
+              stranka.guieleTablicaPregledUpisa.m_table.setRowSorter(sorter2);
+              
+              //Narudžba
+               String [] args2={"x_narudzba "
+                         , " id, fk_proizvod, nacin_dostave, datum_od, datum_do, kolicina, danitjednu, tip, akvizicija, promocija, cjenik, nacin_placanja, frek_placanja"};
+               String where2=" WHERE id='"+id_nar+"'  ";
+              
+               rs=sqlqupit.SqlSelect(args2,where2);
+              
+              
+               String datum_od;
+               String datum_do;
+               while (rs.next()) {
+                   
+                    datum_od = formatterHr.format(rs.getDate("datum_od"));
+                    datum_do = formatterHr.format(rs.getDate("datum_do"));
+                    narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.addElement(new StockData(rs.getString("id"),rs.getString("fk_proizvod"), rs.getString("nacin_dostave"), datum_od, datum_do,rs.getString("kolicina"),rs.getString("danitjednu"), rs.getString("tip"),rs.getString("akvizicija"),rs.getString("promocija"),rs.getString("cjenik"), rs.getString("nacin_placanja"), rs.getString("frek_placanja"), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));                    
+                   
+               }
+               TableRowSorter<StockTableDataTest> sorter3= new TableRowSorter<StockTableDataTest>(narudzba.guieleTablicaPregledNarudzba.m_data);
+              narudzba.guieleTablicaPregledNarudzba.m_table.setRowSorter(sorter3);
+             
+             
+             
+              //Relacije
+              String [] args3={"x_narudzba INNER JOIN "+
+                    " x_klijent ON x_narudzba.fk_placa = x_klijent.id "+
+                    " WHERE     (x_narudzba.id=  '"+id_nar+"') "+
+                    " UNION "+
+                    " SELECT     x_narudzba_1.id AS id_nar, 'PR' AS relacija, x_klijent_1.id, RTRIM(x_klijent_1.ime + N' ' + x_klijent_1.prezime + N' ' + x_klijent_1.firma) AS stranka, "+
+                    " RTRIM(x_klijent_1.ulica + N' ' + x_klijent_1.kbr + N' ' + x_klijent_1.kbrtxt) AS adresa, RTRIM(x_klijent_1.pbr + N' ' + x_klijent_1.mjesto+N' '+ x_klijent_1.naselje) AS mjesto, "+
+                    " RTRIM(x_klijent_1.telefon + N' ' + x_klijent_1.mobitel) AS telefon "+
+                    " FROM         x_narudzba AS x_narudzba_1 INNER JOIN "+
+                    " x_klijent AS x_klijent_1 ON x_narudzba_1.fk_prima = x_klijent_1.id "+
+                    " WHERE     (x_narudzba_1.id= '"+id_nar+"')"
+                       
+                      , " x_narudzba.id AS id_nar, 'PL' AS relacija, x_klijent.id, RTRIM(x_klijent.ime + N' ' + x_klijent.prezime + N' ' + x_klijent.firma) "+
+                    " AS stranka, RTRIM(x_klijent.ulica + N' ' + x_klijent.kbr + N' ' + x_klijent.kbrtxt) AS adresa,  "+
+                    " RTRIM(x_klijent.pbr + N' ' + x_klijent.mjesto+N' '+ x_klijent.naselje) AS mjesto, RTRIM(x_klijent.telefon + N' ' + x_klijent.mobitel) AS telefon"
+                        };
+              String where3="";
+             
+              rs=sqlqupit.SqlSelect(args3,where3);
+             
+              while (rs.next()) {
+                   narudzba.guieleTablicaRelacije.m_data.m_vector.addElement(new StockData(rs.getString("id_nar"),rs.getString("relacija"), rs.getString("id") , rs.getString("stranka"), rs.getString("adresa"), rs.getString("mjesto"), rs.getString("telefon"), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));
+                 
+              }
+              TableRowSorter<StockTableDataTest> sorter4= new TableRowSorter<StockTableDataTest>(narudzba.guieleTablicaRelacije.m_data);
+              narudzba.guieleTablicaRelacije.m_table.setRowSorter(sorter4);
+        
+             
+              
+
+              
+               sqlqupit.con.close();
+          } catch (SQLException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+          }
+         
+          NapuniNarudzba(id_nar);
+          NapuniStranka(id);
+         
+         
+         
+         
+     }
+
+
+     private void NapuniStranka(int id){
+         
+         
+          SimpleDateFormat formatterSql= new SimpleDateFormat("yyyy-MM-dd");
+          SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+         
+          try {
+               sqlqupit.con = Pocetna.ds.getConnection();
+              
+               //Kontakti
+               String [] args2={"x_klijent "
+                         , " id, stranka, sap_sifra, funkcija, foa, djelatnost, ime, prezime, firma, telefon, mobitel, email, datum_rodenja, oib, ulica, kbr, kbrtxt, pbr, mjesto, naselje, zupanija, zemlja, email_racun, komentar, izvadak, jed"};
+               String where2=" WHERE id="+id+"  ";
+               rs=sqlqupit.SqlSelect(args2,where2);
+              
+               while (rs.next()) {
+                    stranka.id.setText(rs.getString("id"));
+                    stranka.šifra.setText(rs.getString("sap_sifra"));
+                    stranka.industrija.setText(rs.getString("djelatnost"));
+                    stranka.ime.setText(rs.getString("ime"));
+                    stranka.prezime.setText(rs.getString("prezime"));
+                    stranka.firma.setText(rs.getString("firma"));
+                    stranka.telefon.setText(rs.getString("telefon"));
+                    stranka.mobitel.setText(rs.getString("mobitel"));
+                    stranka.email.setText(rs.getString("email"));
+                    stranka.datum_rođ.setText(formatterHr.format(rs.getDate("datum_rodenja")));
+                    if (stranka.datum_rođ.getText().equals("01.01.1900")) stranka.datum_rođ.setText("");
+                    stranka.oib.setText(rs.getString("oib"));
+                    stranka.pbr.setText(rs.getString("pbr"));
+                    stranka.mjesto.setText(rs.getString("mjesto"));
+                    stranka.naselje.setText(rs.getString("naselje"));
+                    stranka.ulica.setText(rs.getString("ulica"));
+                    stranka.kbr.setText(rs.getString("kbr"));
+                    stranka.kbrtxt.setText(rs.getString("kbrtxt"));
+                    stranka.zupanija.setText(rs.getString("zupanija"));
+                    stranka.zemlja.setText(rs.getString("zemlja"));
+               }
+         
+
+          sqlqupit.con.close();
+     } catch (SQLException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+     }
+     }
+
+private int NapuniNarudzba(int id_nar){
+    
+     SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+     int id=0;
+     try {
+         
+          sqlqupit.con = Pocetna.ds.getConnection();
+              
+          String [] args1={"x_narudzba "
+                    , " id, fk_placa,fk_prima,fk_proizvod, nacin_dostave, datum_od, datum_do, kolicina, danitjednu, tip, akvizicija, promocija, cjenik, nacin_placanja, frek_placanja,razlog_kupnje,razlog_prekida"};
+          String where1=" WHERE id='"+id_nar+"'  ";
+         
+          rs=sqlqupit.SqlSelect(args1,where1);
+         
+          while (rs.next()) {
+              
+              
+               narudzba.id.setText(rs.getString("id"));
+               narudzba.id_pl.setText(rs.getString("fk_placa"));
+               narudzba.id_pr.setText(rs.getString("fk_prima"));
+               narudzba.proizvod.setText(rs.getString("fk_proizvod"));
+               narudzba.nacin_dostave.setText(rs.getString("nacin_dostave"));
+               narudzba.datum_od.setText(formatterHr.format(rs.getDate("datum_od")));
+               narudzba.datum_do.setText(formatterHr.format(rs.getDate("datum_do")));
+               narudzba.količina.setText(rs.getString("kolicina"));
+               narudzba.dani_tjednu.setText(rs.getString("danitjednu"));
+               narudzba.tip.setText(rs.getString("tip"));
+               narudzba.akvizicija.setText(rs.getString("akvizicija"));
+               narudzba.promocija.setText(rs.getString("promocija"));
+               narudzba.cjenik.setText(rs.getString("cjenik"));
+               narudzba.nacin.setText(rs.getString("nacin_placanja"));
+               narudzba.frekvencija.setText(rs.getString("frek_placanja"));
+               narudzba.r_prihvaca.setText(rs.getString("razlog_kupnje"));
+               narudzba.r_prekida.setText(rs.getString("razlog_prekida"));
+              
+               id=rs.getInt("fk_placa");
+          }
+         
+
+          sqlqupit.con.close();
+     } catch (SQLException e) {
+          // TODO Auto-generated catch block
+          e.printStackTrace();
+     }
+    
+     return id;
+}
+    
+     //panel sa naslovom
+     private Component Naslov(){
+          int desno=10;
+          int dolje=0;
+          int široko=90;
+          int visoko=18;
+         
+         
+          Pocetna.guiele.mpanel=new JPanel(new BorderLayout());
+          Pocetna.guiele.mpanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+          JPanel jp=Pocetna.guiele.mpanel;
+         
+          Pocetna.guiele.mlabel=new JLabel("Pretplatnici");
+          Pocetna.guiele.mlabel.setForeground(new java.awt.Color(255, 255, 255));
+          jp.add(Pocetna.guiele.Mlabel());
+          return Pocetna.guiele.Mpanel("Naslov");
+         
+     }
+    
+     //panel sa naslovom
+     private JButton ocisti;
+     private Component PodNaslov(){
+          int desno=10;
+          int dolje=0;
+          int široko=90;
+          int visoko=18;
+         
+         
+          Pocetna.guiele.mpanel=new JPanel(new BorderLayout());
+          Pocetna.guiele.mpanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+          JPanel jp=Pocetna.guiele.mpanel;
+         
+          Pocetna.guiele.mlabel=new JLabel("");
+          jp.add(Pocetna.guiele.Mlabel());
+         
+          Pocetna.guiele.mbutton=new JButton(Pocetna.disketa_ico);
+          Pocetna.guiele.mbutton.setBackground(new java.awt.Color(206, 223, 239));
+          JButton snimi=Pocetna.guiele.mbutton;
+          jp.add(Pocetna.guiele.Mbutton());
+         
+          snimi.addActionListener(new ActionListener( ) {
+                         public void actionPerformed(ActionEvent ev) {
+                                  
+                                   if (!narudzba.id_pl.getText().equals("") && narudzba.id_pr.getText().equals("") || narudzba.id_pl.getText().equals("") && !narudzba.id_pr.getText().equals("")){
+                                        Snimi2();
+                                        return;
+                                   }
+                             
+                                   System.out.println("Snimi");                                  
+                                  
+                                  
+                                   //Stranka
+                                   jed=null;
+                                   if (!stranka.id.getText().equals("") ){
+                                       
+                                        //update
+                                        for (int i=0; i<stranka.guieleTablicaPregledUpisa.m_data.getRowCount();i++){
+                                                  if(stranka.guieleTablicaPregledUpisa.m_table.getValueAt(i, 0).toString().equals(stranka.id.getText())){
+                                                       stranka.guieleTablicaPregledUpisa.m_data.m_vector.removeElementAt(i);
+                                                       break;
+                                                  }
+                                        }
+                                        jed=sqlCommand.UpdateStranka(Integer.parseInt(stranka.id.getText())  ,stranka.šifra.getText() ,stranka.foa.getText() ,stranka.industrija.getText()
+                                                  ,stranka.ime.getText() ,stranka.prezime.getText() ,stranka.firma.getText() ,stranka.telefon.getText() ,stranka.mobitel.getText() ,stranka.email.getText()
+                                                  ,stranka.datum_rođ.getText() ,stranka.oib.getText() ,stranka.ulica.getText() ,stranka.kbr.getText() ,stranka.kbrtxt.getText() ,stranka.pbr.getText()
+                                                  ,stranka.mjesto.getText() ,stranka.naselje.getText() ,stranka.zupanija.getText() ,stranka.zemlja.getText()  );
+                                   }
+                                   if (stranka.id.getText().equals("") ) {
+                                       
+                                        //insert
+                                        jed=sqlCommand.SnimanjeStranka(stranka.šifra.getText()     ,stranka.foa.getText()     ,stranka.industrija.getText()     ,stranka.ime.getText()     ,stranka.prezime.getText()    
+                                                  ,stranka.firma.getText()     ,stranka.telefon.getText()     ,stranka.mobitel.getText()     ,stranka.email.getText()     ,stranka.oib.getText()     ,stranka.datum_rođ.getText()          
+                                                  ,stranka.ulica.getText()     ,stranka.kbr.getText()     ,stranka.kbrtxt.getText()     ,stranka.pbr.getText()     ,stranka.mjesto.getText()     ,stranka.naselje.getText()    
+                                                  ,stranka.zupanija.getText()     ,stranka.zemlja.getText());
+                                       
+                                        narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeAllElements();
+                                      
+                                   }
+                                 
+                                   if (jed==null) return;
+                                  
+                        
+                                   int id=DodajTablicaStranka(jed);
+                                 
+                                   //označi zadnjeg upisanog kontakta
+                                  if (stranka.guieleTablicaPregledUpisa.m_data.getRowCount()>0){
+                                       stranka.guieleTablicaPregledUpisa.m_table.setRowSelectionInterval(stranka.guieleTablicaPregledUpisa.m_data.getRowCount()-1,stranka.guieleTablicaPregledUpisa.m_data.getRowCount()-1);
+                                       stranka.guieleTablicaPregledUpisa.m_table.scrollRectToVisible(stranka.guieleTablicaPregledUpisa.m_table.getCellRect(stranka.guieleTablicaPregledUpisa.m_data.getRowCount()-1, 0, false));
+                                   }
+                                  //PocistiStranka();
+                             
+                                 
+                                  //Narudzba
+                                  jed=null;
+                                  if (!narudzba.id.getText().equals("")  ){
+                                        //update
+                                        for (int i=0; i<narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount();i++){
+                                                  if(narudzba.guieleTablicaPregledNarudzba.m_table.getValueAt(i, 0).toString().equals(narudzba.id.getText())){
+                                                       narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeElementAt(i);
+                                                       break;
+                                                  }
+                                                 
+                                        }
+                                        for (int i=0; i<narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount();i++){
+                                             if(narudzba.guieleTablicaPregledNarudzba.m_table.getValueAt(i, 0).toString().equals("0")){
+                                                  narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeElementAt(i);
+                                                  break;
+                                             }
+                                        }
+                                        jed=sqlCommand.UpdateNarudzba(Integer.parseInt(narudzba.id.getText()) ,narudzba.id_pl.getText() ,narudzba.id_pr.getText() ,narudzba.proizvod.getText()
+                                                  ,narudzba.nacin_dostave.getText() ,narudzba.datum_od.getText() ,narudzba.datum_do.getText() ,narudzba.količina.getText() ,narudzba.tip.getText()
+                                                  ,narudzba.dani_tjednu.getText(),narudzba.akvizicija.getText() ,narudzba.promocija.getText() ,narudzba.cjenik.getText() ,narudzba.nacin.getText()
+                                                  ,narudzba.frekvencija.getText() ,narudzba.r_prihvaca.getText() ,narudzba.r_prekida.getText() );
+                                   }
+                                  if (narudzba.id.getText().equals("") ){
+                                        //insert
+                                        for (int i=0; i<narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount();i++){
+                                                  if(narudzba.guieleTablicaPregledNarudzba.m_table.getValueAt(i, 0).toString().equals("0")){
+                                                       narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeElementAt(i);
+                                                       break;
+                                                  }
+                                        }
+                                        jed=sqlCommand.SnimanjeNarudzba(id, narudzba.proizvod.getText()     ,narudzba.nacin_dostave.getText() ,narudzba.datum_od.getText() ,narudzba.datum_do.getText()
+                                                  ,narudzba.količina.getText(),narudzba.dani_tjednu.getText() ,narudzba.tip.getText() ,narudzba.akvizicija.getText() ,narudzba.promocija.getText()
+                                                  ,narudzba.cjenik.getText() ,narudzba.nacin.getText() ,narudzba.frekvencija.getText());
+                                   }
+                                  
+                                   if (jed==null) return;
+                                 
+                                  
+                                   int id_nar=DodajTablicaNarudzba(jed);
+                                            
+                                   //označi zadnjeg upisanog narudzba
+                                  if (narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()>0){
+                                       narudzba.guieleTablicaPregledNarudzba.m_table.setRowSelectionInterval(narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()-1,narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()-1);
+                                       narudzba.guieleTablicaPregledNarudzba.m_table.scrollRectToVisible(narudzba.guieleTablicaPregledNarudzba.m_table.getCellRect(narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()-1, 0, false));
+                                   }
+                                  //PocistiNarudzba();
+                             
+                                  
+                                  
+                                  
+                                 
+                                  //Relacije
+                                  //jed=null;
+                                  
+                                  /*if ( narudzba.id_pl.getText().equals("") && narudzba.id_pr.getText().equals("")){
+                                        //update
+                                        if (narudzba.id_pl.getText().equals("")) {
+                                            
+                                             for (int i=0; i<narudzba.guieleTablicaRelacije.m_data.getRowCount();i++){
+                                                       if(narudzba.guieleTablicaRelacije.m_table.getValueAt(i, 2).toString().equals(stranka.id.getText()) && narudzba.guieleTablicaRelacije.m_table.getValueAt(i, 1).toString().equals("PR")){
+                                                            narudzba.guieleTablicaRelacije.m_data.m_vector.removeElementAt(i);
+                                                            break;
+                                                       }
+                                             }
+                                        }
+                                        UpdateRelacija(Integer.parseInt(narudzba.id.getText()));
+                                   }*/
+                                  if (narudzba.id.getText().equals("") ){
+                                        //insert
+                                        jed=SnimanjeRelacija(id_nar,id,"PL");
+                                        jed=SnimanjeRelacija(id_nar,id,"PR");
+                                        //narudzba.guieleTablicaRelacije.m_data.m_vector.removeAllElements();
+                                   }
+                                  narudzba.guieleTablicaRelacije.m_data.m_vector.removeAllElements();    
+                                        
+                                  if (jed==null) return;
+                                  
+                                   DodajTablicaRelacija(id_nar);
+         
+                                   //označi zadnjeg upisanog kontakta
+                                  /*if (stranka.guieleTablicaKontakti.m_data.getRowCount()>0){
+                                       stranka.guieleTablicaKontakti.m_table.setRowSelectionInterval(stranka.guieleTablicaKontakti.m_data.getRowCount()-1,stranka.guieleTablicaKontakti.m_data.getRowCount()-1);
+                                       stranka.guieleTablicaKontakti.m_table.scrollRectToVisible(stranka.guieleTablicaKontakti.m_table.getCellRect(stranka.guieleTablicaKontakti.m_data.getRowCount()-1, 0, false));
+                                   }
+                                  PocistiKontakte();*/
+                                 
+                                   PocistiStranka();
+                                   PocistiNarudzba();
+                         }
+                    });
+    
+    
+          Pocetna.guiele.mbutton=new JButton(Pocetna.ocisti_ico);
+          Pocetna.guiele.mbutton.setBackground(new java.awt.Color(206, 223, 239));
+          ocisti=Pocetna.guiele.mbutton;
+               jp.add(Pocetna.guiele.Mbutton());
+         
+               ocisti.addActionListener(new ActionListener( ) {
+                         public void actionPerformed(ActionEvent ev) {
+                                  
+                                  System.out.println("Ocisti");
+                                  PocistiStranka();
+                                  PocistiNarudzba();
+                         }
+                    });
+         
+          return Pocetna.guiele.Mpanel("");
+    
+     }
+    
+     private void Snimi2(){
+              
+           String funkcija="";
+           if (narudzba.id_pl.getText().equals("")){
+                funkcija="PL";
+           }
+           if (narudzba.id_pr.getText().equals("")){
+                funkcija="PR";
+           }
+          
+           System.out.println("Snimi2");
+           jed=null;
+          
+           //stranka
+          //insert
+           jed=sqlCommand.SnimanjeStranka(stranka.šifra.getText()     ,stranka.foa.getText()     ,stranka.industrija.getText()     ,stranka.ime.getText()     ,stranka.prezime.getText()    
+                     ,stranka.firma.getText()     ,stranka.telefon.getText()     ,stranka.mobitel.getText()     ,stranka.email.getText()     ,stranka.oib.getText()     ,stranka.datum_rođ.getText()         
+                     ,stranka.ulica.getText()     ,stranka.kbr.getText()     ,stranka.kbrtxt.getText()     ,stranka.pbr.getText()     ,stranka.mjesto.getText()     ,stranka.naselje.getText()    
+                     ,stranka.zupanija.getText()     ,stranka.zemlja.getText());
+         
+           int id=DodajTablicaStranka(jed);
+          
+           stranka.id.setText(String.valueOf(id));
+          if (funkcija.equals("PL")) narudzba.id_pl.setText(String.valueOf(id));
+          if (funkcija.equals("PR")) narudzba.id_pr.setText(String.valueOf(id));
+          
+           //obriš dodanog iz tablice
+          if (funkcija.equals("PR")){
+                    for (int i=0; i<stranka.guieleTablicaPregledUpisa.m_data.getRowCount();i++){
+                              if(stranka.guieleTablicaPregledUpisa.m_table.getValueAt(i, 0).toString().equals(stranka.id.getText())){
+                                   stranka.guieleTablicaPregledUpisa.m_data.m_vector.removeElementAt(i);
+                                   break;
+                              }
+                    }
+          }
+          if (funkcija.equals("PL")){
+               //nemoj brisati jer ako ima još narudžbi
+               /*for (int i=0; i<stranka.guieleTablicaPregledUpisa.m_data.getRowCount();i++){
+                         if(stranka.guieleTablicaPregledUpisa.m_table.getValueAt(i, 0).toString().equals(stranka.id.getText())){
+                              stranka.guieleTablicaPregledUpisa.m_data.m_vector.removeElementAt(i);
+                              break;
+                         }
+               }*/
+          }
+         
+          //označi zadnjeg upisanog kontakta
+          if (stranka.guieleTablicaPregledUpisa.m_data.getRowCount()>0){
+               stranka.guieleTablicaPregledUpisa.m_table.setRowSelectionInterval(stranka.guieleTablicaPregledUpisa.m_data.getRowCount()-1,stranka.guieleTablicaPregledUpisa.m_data.getRowCount()-1);
+               stranka.guieleTablicaPregledUpisa.m_table.scrollRectToVisible(stranka.guieleTablicaPregledUpisa.m_table.getCellRect(stranka.guieleTablicaPregledUpisa.m_data.getRowCount()-1, 0, false));
+          }
+         
+         
+          //narudžba
+          int id_nar=Integer.parseInt(narudzba.id.getText());
+          //update
+          for (int i=0; i<narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount();i++){
+                    if(narudzba.guieleTablicaPregledNarudzba.m_table.getValueAt(i, 0).toString().equals(narudzba.id.getText())){
+                         narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeElementAt(i);
+                         break;
+                    }
+                   
+          }
+          for (int i=0; i<narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount();i++){
+           if(narudzba.guieleTablicaPregledNarudzba.m_table.getValueAt(i, 0).toString().equals("0")){
+                    narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.removeElementAt(i);
+                    break;
+               }
+          }
+          jed=sqlCommand.UpdateNarudzba(id_nar ,narudzba.id_pl.getText() ,narudzba.id_pr.getText() ,narudzba.proizvod.getText()
+                     ,narudzba.nacin_dostave.getText() ,narudzba.datum_od.getText() ,narudzba.datum_do.getText() ,narudzba.količina.getText() ,narudzba.tip.getText()
+                     ,narudzba.dani_tjednu.getText(),narudzba.akvizicija.getText() ,narudzba.promocija.getText() ,narudzba.cjenik.getText() ,narudzba.nacin.getText()
+                     ,narudzba.frekvencija.getText() ,narudzba.r_prihvaca.getText() ,narudzba.r_prekida.getText());
+    
+          if (jed==null) return;
+         
+          DodajTablicaNarudzba(jed);
+         
+          //označi zadnjeg upisanog narudzba
+          if (narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()>0){
+               narudzba.guieleTablicaPregledNarudzba.m_table.setRowSelectionInterval(narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()-1,narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()-1);
+               narudzba.guieleTablicaPregledNarudzba.m_table.scrollRectToVisible(narudzba.guieleTablicaPregledNarudzba.m_table.getCellRect(narudzba.guieleTablicaPregledNarudzba.m_data.getRowCount()-1, 0, false));
+          }
+         
+         
+          //relacija
+          //update
+          for (int i=0; i<narudzba.guieleTablicaRelacije.m_data.getRowCount();i++){
+                    if(narudzba.guieleTablicaRelacije.m_table.getValueAt(i, 2).toString().equals(stranka.id.getText()) && narudzba.guieleTablicaRelacije.m_table.getValueAt(i, 1).toString().equals(funkcija)){
+                         narudzba.guieleTablicaRelacije.m_data.m_vector.removeElementAt(i);
+                         break;
+                    }
+          }
+          jed=UpdateRelacija(id_nar,id,funkcija);
+         
+          narudzba.guieleTablicaRelacije.m_data.m_vector.removeAllElements();    
+           
+         if (jed==null) return;
+          
+           DodajTablicaRelacija(id_nar);
+         
+     }
+    
+     SqlUpit sqlqupit=new SqlUpit();
+     SqlCommand sqlCommand=new SqlCommand();
+     UUID jed;
+    
+     //STRANKA
+     /*private UUID SnimanjeStranka(){
+         
+          int id=0;
+         
+                    String datum_rođ_sql="1900.1.1";
+                    if (!stranka.datum_rođ.getText().equals("")){
+                         SimpleDateFormat formatterSql= new SimpleDateFormat("yyyy-MM-dd");
+                         SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+                         Date datum_rođ=null;
+                                        try {
+                                             datum_rođ = formatterHr.parse(stranka.datum_rođ.getText());
+                                             datum_rođ_sql = formatterSql.format(datum_rođ);
+                                        } catch (ParseException e) {
+                                             // TODO Auto-generated catch block
+                                             e.printStackTrace();
+                                             return null;
+                                        }
+                    }
+              
+                   
+                    try {
+                         sqlqupit.con = Pocetna.ds.getConnection();
+                        
+                         jed = UUID.randomUUID();
+                        
+                         //x_klijent
+                         String args[]={"x_klijent"     ,"stranka"          ," sap_sifra"                    ," foa"                              ," djelatnost"                              ," ime"                              ," prezime"                                   ," firma"                                   ," telefon"                              ," mobitel"                              ," email"                                   ," oib"                              ,"datum_rodenja"          ," ulica"                              ," kbr"                              ," kbrtxt"                              ," pbr"                              ," mjesto"                              ," naselje"                              ,"zupanija"                                   ," zemlja"                              ,"jed"                    };
+                         String val[]={""                    ,""                         ,stranka.šifra.getText()     ,stranka.foa.getText()     ,stranka.industrija.getText()     ,stranka.ime.getText()     ,stranka.prezime.getText()     ,stranka.firma.getText()     ,stranka.telefon.getText()     ,stranka.mobitel.getText()     ,stranka.email.getText()     ,stranka.oib.getText()     ,datum_rođ_sql          ,stranka.ulica.getText()     ,stranka.kbr.getText()     ,stranka.kbrtxt.getText()     ,stranka.pbr.getText()     ,stranka.mjesto.getText()     ,stranka.naselje.getText()     ,stranka.zupanija.getText()     ,stranka.zemlja.getText()     ,jed.toString()     };
+              
+                         sqlqupit.SqlInsert(args, val);
+              
+                         sqlqupit.con.close();
+                    } catch (SQLException e) {
+                         // TODO Auto-generated catch block
+                         e.printStackTrace();
+                    }
+                   
+                    return jed;
+          }*/
+    
+     /*private UUID UpdateStranka(int id){
+         
+          String datum_rođ_sql="1900.1.1";
+          if (!stranka.datum_rođ.getText().equals("")){
+               SimpleDateFormat formatterSql= new SimpleDateFormat("yyyy-MM-dd");
+               SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+               Date datum_rođ=null;
+                              try {
+                                   datum_rođ = formatterHr.parse(stranka.datum_rođ.getText());
+                                   datum_rođ_sql = formatterSql.format(datum_rođ);
+                              } catch (ParseException e) {
+                                   // TODO Auto-generated catch block
+                                   e.printStackTrace();
+                                   return null;
+                              }
+          }
+
+          try {
+             sqlqupit.con = Pocetna.ds.getConnection();
+            
+             jed = UUID.randomUUID();
+            
+             int status=0;
+                 //update dopisnice
+             String [] args0={"x_klijent "
+                         ," sap_sifra='"+stranka.šifra.getText()+"' , foa='"+stranka.foa.getText()+"', djelatnost='"+stranka.industrija.getText()+"', ime='"+stranka.ime.getText()+"', prezime='"+stranka.prezime.getText()+"', " +
+                         " firma='"+stranka.firma.getText()+"', telefon='"+stranka.telefon.getText()+"', mobitel='"+stranka.mobitel.getText()+"', email='"+stranka.email.getText()+"', datum_rodenja='"+datum_rođ_sql+"', " +
+                         " oib='"+stranka.oib.getText()+"', ulica='"+stranka.ulica.getText()+"', kbr='"+stranka.kbr.getText()+"', kbrtxt='"+stranka.kbrtxt.getText()+"', pbr='"+stranka.pbr.getText()+"' , " +
+                         " mjesto='"+stranka.mjesto.getText()+"', naselje='"+stranka.naselje.getText()+"', zupanija='"+stranka.zupanija.getText()+"', zemlja='"+stranka.zemlja.getText()+"' ," +
+                         " jed='"+jed.toString()+"'"};
+               String where0="id="+id+"  " ;
+               status=sqlqupit.SqlUpdate(args0,where0);
+              
+                    sqlqupit.con.close();
+          } catch (SQLException e1) {
+               // TODO Auto-generated catch block
+               e1.printStackTrace();
+          }         
+    
+     return jed;
+     }*/
+    
+     private int DodajTablicaStranka(UUID jed){
+          int id=0;
+          try {
+               sqlqupit.con = Pocetna.ds.getConnection();
+              
+                   
+               String [] args1={"x_klijent "
+                         , "id" +
+                         ",RTRIM(ime + N' ' + prezime + N' ' + firma) AS stranka " +
+                         ",RTRIM(telefon + N' ' + mobitel) AS telefon"+
+                         ",RTRIM(ulica + N' ' + kbr + N' ' + kbrtxt) AS ulica, RTRIM(pbr + N' ' + mjesto+N' '+ naselje) AS mjesto"
+                         };
+               String where1=" WHERE jed='"+jed+"'  ";
+              
+               rs=sqlqupit.SqlSelect(args1,where1);
+              
+                 
+               while (rs.next()) {
+                    stranka.guieleTablicaPregledUpisa.m_data.m_vector.addElement(new StockData(rs.getString("id"),rs.getString("stranka"), rs.getString("ulica"), rs.getString("mjesto"), rs.getString("telefon"), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));
+                    id=rs.getInt("id");
+               }
+               TableRowSorter<StockTableDataTest> sorter2= new TableRowSorter<StockTableDataTest>(stranka.guieleTablicaPregledUpisa.m_data);
+              stranka.guieleTablicaPregledUpisa.m_table.setRowSorter(sorter2);
+              
+
+               sqlqupit.con.close();
+          } catch (SQLException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+          }
+         
+          return id;
+     }    
+    
+private void PocistiStranka(){
+         
+          stranka.id.setText("");
+          stranka.šifra.setText("");
+          stranka.foa.setText("");
+          stranka.industrija.setText("");
+          stranka.ime.setText("");
+          stranka.prezime.setText("");
+          stranka.firma.setText("");
+          stranka.telefon.setText("");
+          stranka.mobitel.setText("");
+          stranka.email.setText("");
+          stranka.oib.setText("");
+          stranka.datum_rođ.setText("");
+          stranka.pbr.setText("");
+          stranka.mjesto.setText("");
+          stranka.naselje.setText("");
+          stranka.ulica.setText("");
+          stranka.kbr.setText("");
+          stranka.kbrtxt.setText("");
+          stranka.zupanija.setText("");
+          stranka.zemlja.setText("");
+     }
+
+
+//NARUDŽBA
+          /*private UUID  SnimanjeNarudzba(int id){
+              
+               String datum_od_sql="1900.1.1";
+               String datum_do_sql="9999.12.31";
+               if (!narudzba.datum_od.getText().equals("") ){
+                    SimpleDateFormat formatterSql= new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+                    Date datum_od=null;
+                    Date datum_do=null;
+                                   try {
+                                        datum_od = formatterHr.parse(narudzba.datum_od.getText());
+                                        datum_od_sql = formatterSql.format(datum_od);
+                                        if (!narudzba.datum_do.getText().equals("")){
+                                             datum_do = formatterHr.parse(narudzba.datum_do.getText());
+                                             datum_do_sql = formatterSql.format(datum_do);
+                                        }
+                                   } catch (ParseException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                        //return;
+                                   }              
+               }
+              
+               try {
+                   sqlqupit.con = Pocetna.ds.getConnection();
+                  
+                   jed = UUID.randomUUID();
+                  
+                   //x_narudzba
+                  String args[]={"x_narudzba"     ,"fk_placa"                    ,"fk_prima"                    ,"jed"                         ," fk_proizvod"                              ," nacin_dostave"                                   ," datum_od"          ," datum_do"          ," kolicina"                                        ," danitjednu"                                        ," tip"                                        ," akvizicija"                                   ," promocija"                                   ," cjenik"                                        ," nacin_placanja"                         ," frek_placanja"                              };
+                  String val[]={""                              ,String.valueOf(id)     ,String.valueOf(id)     ,jed.toString()          ,narudzba.proizvod.getText()     ,narudzba.nacin_dostave.getText()     ,datum_od_sql     ,datum_do_sql     ,narudzba.količina.getText()          ,narudzba.dani_tjednu.getText()          ,narudzba.tip.getText()          ,narudzba.akvizicija.getText()     ,narudzba.promocija.getText()     ,narudzba.cjenik.getText()          ,narudzba.nacin.getText()          ,narudzba.frekvencija.getText()     };    
+         
+                  sqlqupit.SqlInsert(args, val);
+                 
+                           
+               sqlqupit.con.close();
+               } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+               }
+              
+               return jed;
+         
+     }*/
+         
+          /*private UUID UpdateNarudzba(int id_nar){
+              
+               String datum_od_sql="1900.1.1";
+               String datum_do_sql="9999.12.31";
+               if (!narudzba.datum_od.getText().equals("") ){
+                    SimpleDateFormat formatterSql= new SimpleDateFormat("yyyy-MM-dd");
+                    SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+                    Date datum_od=null;
+                    Date datum_do=null;
+                                   try {
+                                        datum_od = formatterHr.parse(narudzba.datum_od.getText());
+                                        datum_od_sql = formatterSql.format(datum_od);
+                                        if (!narudzba.datum_do.getText().equals("")){
+                                             datum_do = formatterHr.parse(narudzba.datum_do.getText());
+                                             datum_do_sql = formatterSql.format(datum_do);
+                                        }
+                                   } catch (ParseException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                        //return;
+                                   }              
+               }
+
+               try {
+                  sqlqupit.con = Pocetna.ds.getConnection();
+                 
+                  jed = UUID.randomUUID();
+                 
+                  int status=0;
+                      //update dopisnice
+                  String [] args0={"x_narudzba "
+                              ,"  fk_placa='"+narudzba.id_pl.getText()+"' , fk_prima='"+narudzba.id_pr.getText()+"', fk_proizvod='"+narudzba.proizvod.getText()+"' , fk_kampanja='' , nacin_dostave='"+narudzba.nacin_dostave.getText()+"', " +
+                              " datum_od='"+datum_od_sql+"', datum_do='"+datum_do_sql+"', kolicina='"+narudzba.količina.getText()+"', tip='"+narudzba.tip.getText()+"', danitjednu='"+narudzba.dani_tjednu.getText()+"', " +
+                              " akvizicija='"+narudzba.akvizicija.getText()+"', promocija='"+narudzba.promocija.getText()+"', cjenik='"+narudzba.cjenik.getText()+"' ,nacin_placanja='"+narudzba.nacin.getText()+"', frek_placanja='"+narudzba.frekvencija.getText()+"', " +
+                              " razlog_kupnje='"+narudzba.r_prihvaca.getText()+"', razlog_prekida='"+narudzba.r_prekida.getText()+"', " +
+                              " jed='"+jed.toString()+"' "};
+                    String where0="id="+id_nar+"  " ;
+                    status=sqlqupit.SqlUpdate(args0,where0);
+                   
+                         sqlqupit.con.close();
+               } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+               }         
+         
+          return jed;
+}*/
+         
+          private int DodajTablicaNarudzba(UUID jed){
+         
+               SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+               int id_nar=0;
+               try {
+                   
+                    sqlqupit.con = Pocetna.ds.getConnection();
+                        
+                    String [] args1={"x_narudzba "
+                              , " id, fk_proizvod, nacin_dostave, datum_od, datum_do, kolicina, danitjednu, tip, akvizicija, promocija, cjenik, nacin_placanja, frek_placanja"};
+                    String where1=" WHERE jed='"+jed+"'  ";
+                   
+                    rs=sqlqupit.SqlSelect(args1,where1);
+                   
+                   
+                    String datum_od;
+                    String datum_do;
+                    while (rs.next()) {
+                        
+                         datum_od = formatterHr.format(rs.getDate("datum_od"));
+                         datum_do = formatterHr.format(rs.getDate("datum_do"));
+                         narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.addElement(new StockData(rs.getString("id"),rs.getString("fk_proizvod"), rs.getString("nacin_dostave"), datum_od, datum_do,rs.getString("kolicina"),rs.getString("danitjednu"), rs.getString("tip"),rs.getString("akvizicija"),rs.getString("promocija"),rs.getString("cjenik"), rs.getString("nacin_placanja"), rs.getString("frek_placanja"), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));                    
+                         id_nar=rs.getInt("id");
+                    }
+                    TableRowSorter<StockTableDataTest> sorter3= new TableRowSorter<StockTableDataTest>(narudzba.guieleTablicaPregledNarudzba.m_data);
+                   narudzba.guieleTablicaPregledNarudzba.m_table.setRowSorter(sorter3);
+             
+
+                    sqlqupit.con.close();
+               } catch (SQLException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+               }
+               return id_nar;
+              
+          }    
+         
+          private void PocistiNarudzba(){
+              
+               narudzba.id.setText("");
+               narudzba.id_pl.setText("");
+               narudzba.id_pr.setText("");
+               narudzba.količina.setText("1");
+               narudzba.datum_od.setText("");
+               narudzba.datum_do.setText("");
+          }
+         
+
+//RELACIJA
+          private UUID SnimanjeRelacija(int id_nar,int id,String funkcija){
+              
+                    //int id=0;
+                        
+                         try {
+                              sqlqupit.con = Pocetna.ds.getConnection();
+                             
+                              jed = UUID.randomUUID();
+                             
+                              String args[]={" x_relacija"     ,"fk_nar"                                   ," fk_id"                              ,"fk_id2"                         ," funkcija"          ,"jed"                    };
+                              String val[]={""                         ,String.valueOf(id_nar)          ,String.valueOf(id)          ,String.valueOf(id)     ,funkcija               ,jed.toString()     };
+                   
+                              sqlqupit.SqlInsert(args, val);
+                   
+                              sqlqupit.con.close();
+                         } catch (SQLException e) {
+                              // TODO Auto-generated catch block
+                              e.printStackTrace();
+                         }
+                        
+                         return jed;
+               }
+         
+     private UUID UpdateRelacija(int id_nar,int id,String funkcija){
+              
+              
+               try {
+                  sqlqupit.con = Pocetna.ds.getConnection();
+                 
+                  jed = UUID.randomUUID();
+                 
+                  int status=0;
+                      //update relacija
+                  /*String [] args0={" x_relacija "
+                              ,"  fk_id='"+id+"' , " +
+                              " jed='"+jed.toString()+"' "};
+                    String where0="fk_nar="+id_nar+" AND funkcija='"+funkcija+"'  " ;*/
+                 
+                  if (funkcija.equals("PR")){
+                            String [] args0={" x_relacija "
+                                        ,"  fk_id='"+id+"' , " +
+                                        " jed='"+jed.toString()+"' "};
+                              String where0="fk_nar="+id_nar+" AND funkcija='PR'  " ;
+                              status=sqlqupit.SqlUpdate(args0,where0);
+                             
+                              String [] args1={" x_relacija "
+                                        ,"  fk_id2='"+id+"' , " +
+                                        " jed='"+jed.toString()+"' "};
+                              String where1="fk_nar="+id_nar+" AND funkcija='PL'  " ;
+                              status=sqlqupit.SqlUpdate(args1,where1);
+                  }
+                  if (funkcija.equals("PL")){
+                       String [] args0={" x_relacija "
+                                   ,"  fk_id='"+id+"' , " +
+                                   " jed='"+jed.toString()+"' "};
+                         String where0="fk_nar="+id_nar+" AND funkcija='PL'  " ;
+                         status=sqlqupit.SqlUpdate(args0,where0);
+                        
+                         String [] args1={" x_relacija "
+                                   ,"  fk_id2='"+id+"' , " +
+                                   " jed='"+jed.toString()+"' "};
+                         String where1="fk_nar="+id_nar+" AND funkcija='PR'  " ;
+                         status=sqlqupit.SqlUpdate(args1,where1);
+             }
+                         sqlqupit.con.close();
+               } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+               }         
+         
+          return jed;
+}
+          private void DodajTablicaRelacija(int id_nar){
+         
+               //System.out.println("funkcija");
+               try {
+                  
+                    sqlqupit.con = Pocetna.ds.getConnection();
+        
+                    String [] args3={"x_narudzba INNER JOIN "+
+                         " x_klijent ON x_narudzba.fk_placa = x_klijent.id "+
+                         " WHERE     (x_narudzba.id=  '"+id_nar+"') "+
+                         " UNION "+
+                         " SELECT     x_narudzba_1.id AS id_nar, 'PR' AS relacija, x_klijent_1.id, RTRIM(x_klijent_1.ime + N' ' + x_klijent_1.prezime + N' ' + x_klijent_1.firma) AS stranka, "+
+                         " RTRIM(x_klijent_1.ulica + N' ' + x_klijent_1.kbr + N' ' + x_klijent_1.kbrtxt) AS adresa, RTRIM(x_klijent_1.pbr + N' ' + x_klijent_1.mjesto +N' '+ x_klijent_1.naselje) AS mjesto, "+
+                         " RTRIM(x_klijent_1.telefon + N' ' + x_klijent_1.mobitel) AS telefon "+
+                         " FROM         x_narudzba AS x_narudzba_1 INNER JOIN "+
+                         " x_klijent AS x_klijent_1 ON x_narudzba_1.fk_prima = x_klijent_1.id "+
+                         " WHERE     (x_narudzba_1.id= '"+id_nar+"')"
+                            
+                           , " x_narudzba.id AS id_nar, 'PL' AS relacija, x_klijent.id, RTRIM(x_klijent.ime + N' ' + x_klijent.prezime + N' ' + x_klijent.firma) "+
+                         " AS stranka, RTRIM(x_klijent.ulica + N' ' + x_klijent.kbr + N' ' + x_klijent.kbrtxt) AS adresa,  "+
+                         " RTRIM(x_klijent.pbr + N' ' + x_klijent.mjesto+N' '+ x_klijent.naselje) AS mjesto, RTRIM(x_klijent.telefon + N' ' + x_klijent.mobitel) AS telefon"
+                             };
+                   String where3="";
+                  
+                   rs=sqlqupit.SqlSelect(args3,where3);
+                  
+                   while (rs.next()) {
+                        narudzba.guieleTablicaRelacije.m_data.m_vector.addElement(new StockData(rs.getString("id_nar"),rs.getString("relacija"), rs.getString("id") , rs.getString("stranka"), rs.getString("adresa"), rs.getString("mjesto"), rs.getString("telefon"), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));
+                      
+                   }
+                   TableRowSorter<StockTableDataTest> sorter4= new TableRowSorter<StockTableDataTest>(narudzba.guieleTablicaRelacije.m_data);
+                   narudzba.guieleTablicaRelacije.m_table.setRowSorter(sorter4);
+                  
+                          
+               sqlqupit.con.close();
+               } catch (SQLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+               }
+          }
+         
+         
+         
+//Progresivno punjenje
+     private int NapuniTablicaNarudzba2(int id){
+         
+          SimpleDateFormat formatterHr= new SimpleDateFormat("dd.MM.yyyy");
+          int id_nar=0;
+          try {
+               sqlqupit.con = Pocetna.ds.getConnection();
+              
+              
+              //Narudžba
+               String [] args2={"x_narudzba "
+                         , " id, fk_proizvod, nacin_dostave, datum_od, datum_do, kolicina, danitjednu, tip, akvizicija, promocija, cjenik, nacin_placanja, frek_placanja"};
+               String where2=" WHERE fk_placa='"+id+"'  ";
+              
+               rs=sqlqupit.SqlSelect(args2,where2);
+              
+              
+               String datum_od;
+               String datum_do;
+               while (rs.next()) {
+                   
+                    datum_od = formatterHr.format(rs.getDate("datum_od"));
+                    datum_do = formatterHr.format(rs.getDate("datum_do"));
+                    narudzba.guieleTablicaPregledNarudzba.m_data.m_vector.addElement(new StockData(rs.getString("id"),rs.getString("fk_proizvod"), rs.getString("nacin_dostave"), datum_od, datum_do,rs.getString("kolicina"),rs.getString("danitjednu"), rs.getString("tip"),rs.getString("akvizicija"),rs.getString("promocija"),rs.getString("cjenik"), rs.getString("nacin_placanja"), rs.getString("frek_placanja"), "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""));                    
+                   
+                    id_nar=rs.getInt("id");
+               }
+               TableRowSorter<StockTableDataTest> sorter3= new TableRowSorter<StockTableDataTest>(narudzba.guieleTablicaPregledNarudzba.m_data);
+              narudzba.guieleTablicaPregledNarudzba.m_table.setRowSorter(sorter3);
+             
+             
+             
+               sqlqupit.con.close();
+          } catch (SQLException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+          }
+         
+          return id_nar;
+     }
+    
+    
+    
+
+}

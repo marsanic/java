@@ -1,0 +1,466 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.TextField;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyVetoException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.RowFilter;
+import javax.swing.Spring;
+import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+
+//import org.omg.CORBA.portable.ValueOutputStream;
+
+import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+
+public class y_KontrolaMb {
+
+//Potrebne zamjene
+//x_StrankaUpis1 = ovo je puni nazi ove klase
+//z_Prozor2 = ovo je puni nazi klase poslje
+//z_Prozor2_pocetna = ovo je naziv ove klase -> definirano u klasi "Pocetna"
+//z_Prozor1_pocetna = ovo je naziv klase prije -> definirano u klasi "Pocetna"
+//z_Prozor_intfrm =ovo naziv prozor kroz koji sve prolazi -> definirano u klasi "Pocetna" 
+
+private  Statement stmt = null;
+private  ResultSet rs = null;
+
+
+Stranka stranka =new Stranka();
+Narudzba narudzba=new Narudzba();
+
+public Component sadržajprozor () {
+//to je plavi prozor
+Pocetna.z_Prozor_intfrm.setTitle(null);
+
+int desno=10;
+int dolje=10;
+int široko=120;
+int široko2=280;
+int visoko=18;
+
+JPanel jp = new JPanel(new SpringLayout());
+
+jp.add(Naslov(),new SpringLayout.Constraints(
+Spring.constant(desno),//desno
+Spring.constant(dolje),//dolje
+Spring.constant(Pocetna.desktop.getSize().width-75),//široko
+Spring.constant(20)));//visoko
+dolje=dolje+25;
+jp.add(PodNaslov(),new SpringLayout.Constraints(
+Spring.constant(desno),//desno
+Spring.constant(dolje),//dolje
+Spring.constant(Pocetna.desktop.getSize().width-75),//široko
+Spring.constant(30)));//visoko
+
+dolje=dolje+35;
+
+jp.add(KontrolaMb(),new SpringLayout.Constraints(
+Spring.constant(desno),
+Spring.constant(dolje),
+Spring.constant(Pocetna.desktop.getSize().width-75),
+Spring.constant(240)));
+
+dolje=dolje+250;
+
+/*jp.add(stranka.PregledUpisa(),new SpringLayout.Constraints(
+Spring.constant(desno),
+Spring.constant(dolje),
+Spring.constant(Pocetna.desktop.getSize().width-75),//Pocetna.desktop.getSize().width-75
+Spring.constant(Pocetna.desktop.getSize().height-90-dolje)));
+stranka.guieleTablicaPregledUpisa.m_table.registerKeyboardAction(new TablicaAkcijaPregledUpisa(), KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0), 0);*/
+
+dolje=Pocetna.desktop.getSize().height-90;
+
+jp.setPreferredSize(new Dimension(Pocetna.desktop.getSize().width-70,dolje));//(Pocetna.desktop.getSize().width-70, Pocetna.desktop.getSize().height-90));
+return jp;
+}
+
+private Component Naslov(){
+int desno=10;
+int dolje=0;
+int široko=90;
+int visoko=18;
+
+
+Pocetna.guiele.mpanel=new JPanel(new BorderLayout());
+Pocetna.guiele.mpanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+JPanel jp=Pocetna.guiele.mpanel;
+
+Pocetna.guiele.mlabel=new JLabel("Kontrola matičnog broja i jmbg");
+Pocetna.guiele.mlabel.setForeground(new java.awt.Color(255, 255, 255));
+jp.add(Pocetna.guiele.Mlabel());
+return Pocetna.guiele.Mpanel("Naslov"); 
+
+}
+//panel sa naslovom
+private Component PodNaslov(){
+int desno=10;
+int dolje=0;
+int široko=90;
+int visoko=18;
+
+
+Pocetna.guiele.mpanel=new JPanel(new BorderLayout());
+Pocetna.guiele.mpanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+JPanel jp=Pocetna.guiele.mpanel;
+
+Pocetna.guiele.mlabel=new JLabel("");
+jp.add(Pocetna.guiele.Mlabel());
+
+Pocetna.guiele.mbutton=new JButton(Pocetna.trazi_ico);
+Pocetna.guiele.mbutton.setBackground(new java.awt.Color(206, 223, 239));
+JButton trazi=Pocetna.guiele.mbutton;
+jp.add(Pocetna.guiele.Mbutton());
+
+trazi.addActionListener(new ActionListener( ) {
+    public void actionPerformed(ActionEvent ev) {
+     
+    //System.out.println("trazi_ico");
+    PretplatniciTrazi();
+   
+    }
+});
+
+
+Pocetna.guiele.mbutton=new JButton(Pocetna.ocisti_ico);
+Pocetna.guiele.mbutton.setBackground(new java.awt.Color(206, 223, 239));
+JButton ocisti=Pocetna.guiele.mbutton;
+jp.add(Pocetna.guiele.Mbutton());
+
+ocisti.addActionListener(new ActionListener( ) {
+    public void actionPerformed(ActionEvent ev) {
+     
+     
+    /*System.out.println("k_oib");
+    String oib="69435151530";
+    if (oib.length()==11){
+    int ispravno2=k_oib(oib);
+    System.out.println("ispravno:"+ispravno2);
+    }
+   
+    System.out.println("k_mb");
+    String mb="01130234"; //("01130234"); //"0929441");
+    if (mb.length()<=8){
+    int ispravno2=k_mb(mb); 
+    System.out.println("ispravno:"+ispravno2);
+    }*/
+   
+     
+    try {
+             
+    sqlqupit.con = Pocetna.ds.getConnection();
+   
+    String [] args1={"popis_oib_mb"
+             
+      , " bp_nr, oib_mb, ispravno, id" };
+      String where1=" WHERE   (ispravno is NULL) AND (oib_mb <> N'') ";
+     
+      rs=sqlqupit.SqlSelect(args1,where1);
+     
+        String id="";
+        int ispravno=0;
+      while (rs.next()) {
+     
+      ispravno=0;
+     
+      System.out.println("id:"+rs.getString("id"));
+      id=rs.getString("id");
+      System.out.println("id:"+id);
+     
+      if (rs.getString("oib_mb").length()==11){
+    ispravno=k_oib(rs.getString("oib_mb"));
+    System.out.println("ispravno:"+ispravno);
+    }
+     
+      if (rs.getString("oib_mb").length()==8 || rs.getString("oib_mb").length()==7){
+    ispravno=k_mb(rs.getString("oib_mb")); 
+    System.out.println("ispravno:"+ispravno);
+    }
+     
+      if (rs.getString("oib_mb").length()==13 ){
+    ispravno=k_jmbg(rs.getString("oib_mb")); 
+    System.out.println("ispravno:"+ispravno);
+    }
+     
+      int status=0;
+          //update dopisnice
+            String [] args0={"popis_oib_mb "
+    ,"  ispravno="+ispravno+" "};
+      String where0=" id="+id+"  " ;
+   
+            status=sqlqupit.SqlUpdate(args0,where0);
+      }
+     
+     
+      sqlqupit.con.close();
+      } catch (SQLException evv) {
+      // TODO Auto-generated catch block
+      evv.printStackTrace();
+      }
+
+   
+   
+    }
+});
+
+return Pocetna.guiele.Mpanel(""); 
+
+}
+
+
+SqlUpit sqlqupit=new SqlUpit();
+
+
+
+private JTextField pretraga1;
+
+//panel sa naslovom
+private Component KontrolaMb(){
+int desno=10;
+int dolje=0;
+int široko=90;
+int visoko=18;
+
+Pocetna.guiele.mpanel=new JPanel(new SpringLayout());
+JPanel jp=Pocetna.guiele.mpanel;
+
+dolje=dolje+25;
+
+
+//jtextfield
+Pocetna.guiele.mtextfield = new JTextField("");
+pretraga1=Pocetna.guiele.mtextfield;
+jp.add(Pocetna.guiele.Mtextfield(),new SpringLayout.Constraints(
+Spring.constant(desno+2*široko),//desno
+Spring.constant(dolje),//dolje
+Spring.constant(široko+široko),//široko
+Spring.constant(visoko)));//visoko
+pretraga1.setText("");
+
+dolje=dolje+25;
+
+return Pocetna.guiele.Mpanel("KontrolaMb"); 
+
+}
+
+private void PretplatniciTrazi(){
+
+
+}
+
+public int k_oib(String oib){
+
+String line=oib;
+String string = line; // ucitano.getText();
+    String[] str = string.split(""); //("[, ]+(and|or)*[ ]");
+   
+    int suma=0;
+    int suma1=10;
+   
+    for (int i = 1; i < str.length-1; i++){
+    //System.out.println(i);
+    //System.out.println(str[i]);
+   
+    System.out.println("");
+   
+    System.out.println(i);
+    suma=Integer.parseInt(str[i]);
+    System.out.println("B>"+suma);
+   
+    suma=suma+suma1;
+    System.out.println("C>>"+suma);
+   
+   
+    suma=suma % 10;
+    if (suma==0) suma=10;
+    System.out.println("D>"+suma);
+   
+    suma=suma*2;
+    System.out.println("E>"+suma);
+   
+    suma1=suma % 11;
+    System.out.println("/11:"+suma1);
+   
+    //suma1=suma - (suma1 * 11);
+    System.out.println("F>"+suma1);
+   
+    }
+   
+    int kontr1=Integer.parseInt(str[str.length-1]);
+    int kontr2=11-suma1;
+    if (kontr2==10) kontr2=0;
+    System.out.println("kontrolni:"+kontr1+"=="+kontr2);
+   
+    if (kontr2==kontr1) return 1;
+    else return 0;
+   
+}
+
+public int k_mb(String mb){
+
+String line=mb;
+String string = line; // ucitano.getText();
+    String[] str = string.split(""); //("[, ]+(and|or)*[ ]");
+   
+    int suma=0;
+    int pomn=str.length-1;
+    int suma1=0;
+   
+    for (int i = 1; i < str.length-1; i++){
+   
+    System.out.println("");
+   
+    suma=Integer.parseInt(str[i])*pomn;
+    System.out.println(i+":"+suma);
+   
+    suma1=suma1+suma;
+    pomn=pomn-1;
+   
+    }
+   
+   
+    int kontr2=suma1 % 11;
+    kontr2=11-kontr2;
+    if (kontr2==10) kontr2=0;
+    //System.out.println("/11:"+kontr2);
+    
+    int kontr1=Integer.parseInt(str[str.length-1]);
+    System.out.println("kontrolni:"+kontr1+"=="+kontr2);
+   
+    if (kontr2==kontr1) return 1;
+    else return 0;
+   
+}
+
+public int k_jmbg(String jmbg){
+
+String line=jmbg;
+String string = line; // ucitano.getText();
+    String[] str = string.split(""); //("[, ]+(and|or)*[ ]");
+   
+    int suma=0;
+    //int pomn=str.length-1;
+    int suma1=0;
+   
+    for (int i = 1; i < str.length-1; i++){
+   
+    System.out.println("");
+    if (i==1){
+    suma=Integer.parseInt(str[i])*7;
+    }
+    if (i==2){
+    suma=Integer.parseInt(str[i])*6;
+    }
+    if (i==3){
+    suma=Integer.parseInt(str[i])*5;
+    }
+    if (i==4){
+    suma=Integer.parseInt(str[i])*4;
+    }
+    if (i==5){
+    suma=Integer.parseInt(str[i])*3;
+    }
+    if (i==6){
+    suma=Integer.parseInt(str[i])*2;
+    }
+    if (i==7){
+    suma=Integer.parseInt(str[i])*7;
+    }
+    if (i==8){
+    suma=Integer.parseInt(str[i])*6;
+    }
+    if (i==9){
+    suma=Integer.parseInt(str[i])*5;
+    }
+    if (i==10){
+    suma=Integer.parseInt(str[i])*4;
+    }
+    if (i==11){
+    suma=Integer.parseInt(str[i])*3;
+    }
+    if (i==12){
+    suma=Integer.parseInt(str[i])*2;
+    }
+    System.out.println(i+":"+suma);
+   
+    suma1=suma1+suma;
+    //pomn=pomn-1;
+   
+    }
+   
+   
+    int kontr2=suma1 % 11;
+    kontr2=11-kontr2;
+    if (kontr2==11) kontr2=0;
+    //System.out.println("/11:"+kontr2);
+    
+    int kontr1=Integer.parseInt(str[str.length-1]);
+    System.out.println("kontrolni:"+kontr1+"=="+kontr2);
+   
+    if (kontr2==kontr1) return 1;
+    else return 0;
+   
+}
+}
